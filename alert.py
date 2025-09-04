@@ -29,7 +29,7 @@ FINNHUB_WEBSOCKET_URL = f'wss://ws.finnhub.io?token={FINNHUB_API_KEY}'
 def get_historical_data():
     end_date = datetime.now().date()
     start_date = end_date - timedelta(days=5*365)
-    spy = yf.download('SPY', start=start_date, end=end_date)
+    spy = yf.download('SPY', start=start_date, end=end_date) # SPY for demo purposes
     return spy['Close']
 
 def calculate_daily_returns(data):

@@ -25,3 +25,4 @@ env/
 
 # Generated outputs (kept for demo; remove if you prefer clean repo)
 # spy-generated-histogram.png
+SPY_historical_data.csv

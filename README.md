@@ -45,6 +45,24 @@ python3 -m spy_alert
 
 ### Credentials (`.env`)
 
+Open `.env` and set your configuration. **To monitor a different stock, just change `TICKER`:**
+
+```ini
+# Alert configuration — the only lines you need to touch day-to-day
+TICKER=SPY          # any valid symbol: TSLA, AAPL, QQQ, NVDA, etc.
+PERCENTILE=10       # alert fires when daily return is in top/bottom N%
+LOOKBACK_YEARS=5    # years of history used to calibrate thresholds
+
+# Twilio credentials — https://console.twilio.com
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_FROM=+1XXXXXXXXXX
+TWILIO_TO=+1XXXXXXXXXX
+
+# Finnhub API key — https://finnhub.io/dashboard
+FINNHUB_API_KEY=your_finnhub_api_key_here
+```
+
 | Variable | Where to find it |
 |---|---|
 | `TWILIO_ACCOUNT_SID` | [console.twilio.com](https://console.twilio.com) → Account Info |

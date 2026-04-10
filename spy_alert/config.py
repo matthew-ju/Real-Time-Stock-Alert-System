@@ -8,12 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ---------------------------------------------------------------------------
-# Alert tuning
+# Alert tuning — override any of these in .env without touching code.
+# CLI flags (--ticker, --percentile, --lookback) take precedence if provided.
 # ---------------------------------------------------------------------------
 
-DEFAULT_TICKER: str = "SPY"
-DEFAULT_PERCENTILE: int = 10        # top/bottom N% triggers an SMS alert
-DEFAULT_LOOKBACK_YEARS: int = 5     # years of history used to calibrate thresholds
+DEFAULT_TICKER: str = os.getenv("TICKER", "SPY")
+DEFAULT_PERCENTILE: int = int(os.getenv("PERCENTILE", "10"))    # top/bottom N% triggers SMS
+DEFAULT_LOOKBACK_YEARS: int = int(os.getenv("LOOKBACK_YEARS", "5"))  # calibration window
 
 # ---------------------------------------------------------------------------
 # WebSocket resilience
@@ -26,7 +27,8 @@ MAX_RECONNECT_ATTEMPTS: int = 5
 # Output paths
 # ---------------------------------------------------------------------------
 
-HISTOGRAM_OUTPUT_PATH: Path = Path("spy-generated-histogram.png")
+# Histogram filename reflects the configured ticker so multiple runs don't overwrite each other.
+HISTOGRAM_OUTPUT_PATH: Path = Path(f"{DEFAULT_TICKER.lower()}-return-histogram.png")
 
 
 # ---------------------------------------------------------------------------

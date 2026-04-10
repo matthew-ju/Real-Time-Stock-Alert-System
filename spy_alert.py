@@ -26,7 +26,7 @@ import logging
 import os
 import ssl
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -97,6 +97,11 @@ def _require_env(key: str) -> str:
 def fetch_historical_data(ticker: str, lookback_years: int) -> pd.Series:
     """Download adjusted closing prices for *ticker* over the past *lookback_years* years.
 
+    Uses ``yf.Ticker.history()`` rather than ``yf.download()`` because it hits
+    a different Yahoo Finance endpoint that is significantly more reliable and
+    avoids the intermittent ``JSONDecodeError`` that affects the bulk-download
+    API.  Retries up to 3 times with exponential backoff before giving up.
+
     Args:
         ticker: The ticker symbol to fetch (e.g. "SPY").
         lookback_years: Number of years of history to retrieve.
@@ -105,21 +110,35 @@ def fetch_historical_data(ticker: str, lookback_years: int) -> pd.Series:
         A pandas Series of daily closing prices indexed by date.
 
     Raises:
-        ValueError: If yfinance returns an empty DataFrame (bad ticker or no connection).
+        ValueError: If yfinance returns an empty DataFrame after all retries
+            (bad ticker or persistent network/API issue).
     """
-    end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=lookback_years * 365)
-    log.info(
-        "Fetching %d years of %s history (%s → %s) …",
-        lookback_years, ticker, start_date, end_date,
-    )
-    df = yf.download(ticker, start=start_date, end=end_date, progress=False)
-    if df.empty:
-        raise ValueError(
-            f"yfinance returned no data for ticker '{ticker}'. "
-            "Check the symbol and your network connection."
+    period = f"{lookback_years}y"
+    max_attempts = 3
+
+    for attempt in range(1, max_attempts + 1):
+        log.info(
+            "Fetching %d years of %s history via Ticker.history() "
+            "(period=%s, attempt %d/%d) …",
+            lookback_years, ticker, period, attempt, max_attempts,
         )
-    return df["Close"].squeeze()
+        try:
+            df = yf.Ticker(ticker).history(period=period)
+            if not df.empty:
+                return df["Close"]
+            log.warning("Attempt %d returned empty DataFrame.", attempt)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Attempt %d raised %s: %s", attempt, type(exc).__name__, exc)
+
+        if attempt < max_attempts:
+            wait = 2 ** attempt  # 2s, 4s
+            log.info("Retrying in %ds …", wait)
+            time.sleep(wait)
+
+    raise ValueError(
+        f"yfinance returned no data for ticker '{ticker}' after {max_attempts} attempts. "
+        "Check the symbol and your network connection."
+    )
 
 
 def compute_daily_returns(prices: pd.Series) -> pd.Series:

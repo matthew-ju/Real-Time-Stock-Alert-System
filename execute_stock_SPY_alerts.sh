@@ -17,7 +17,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PYTHON_SCRIPT="$SCRIPT_DIR/spy_alert.py"
+PACKAGE_DIR="$SCRIPT_DIR"
 
 log() {
     echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] $*"
@@ -50,8 +50,8 @@ main() {
 
     while true; do
         if is_market_open; then
-            log "Market is open — launching spy_alert.py $*"
-            python3 "$PYTHON_SCRIPT" "$@" || log "spy_alert.py exited with code $?."
+            log "Market is open — launching spy_alert $*"
+            cd "$PACKAGE_DIR" && python3 -m spy_alert "$@" || log "spy_alert.py exited with code $?."
             log "Waiting for next market open …"
         else
             log "Market is closed. Sleeping 60s …"

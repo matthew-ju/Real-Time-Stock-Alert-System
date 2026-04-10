@@ -51,7 +51,7 @@ main() {
     while true; do
         if is_market_open; then
             log "Market is open — launching spy_alert $*"
-            cd "$PACKAGE_DIR" && python3 -m spy_alert "$@" || log "spy_alert.py exited with code $?."
+            cd "$PACKAGE_DIR" && PYTHONPATH=src python3 -m spy_alert "$@" || log "spy_alert.py exited with code $?."
             log "Waiting for next market open …"
         else
             log "Market is closed. Sleeping 60s …"

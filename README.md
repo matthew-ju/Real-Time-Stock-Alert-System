@@ -40,7 +40,7 @@ git clone https://github.com/matthew-ju/Real-Time-Stock-Alert-System.git
 cd Real-Time-Stock-Alert-System
 pip install -r requirements.txt
 cp .env.example .env  # fill in your Twilio + Finnhub credentials
-python3 -m spy_alert
+PYTHONPATH=src python3 -m spy_alert
 ```
 
 ### Credentials (`.env`)
@@ -77,10 +77,10 @@ FINNHUB_API_KEY=your_finnhub_api_key_here
 
 ```bash
 # Defaults: SPY, top/bottom 10%, 5-year lookback
-python3 -m spy_alert
+PYTHONPATH=src python3 -m spy_alert
 
 # Monitor QQQ, alert on top/bottom 5% moves
-python3 -m spy_alert --ticker QQQ --percentile 5 --lookback 3
+PYTHONPATH=src python3 -m spy_alert --ticker QQQ --percentile 5 --lookback 3
 
 # Run only during NYSE market hours (Mon–Fri 9:30 AM–4:00 PM ET)
 bash execute_stock_SPY_alerts.sh [--ticker QQQ] [--percentile 5]
@@ -91,15 +91,16 @@ bash execute_stock_SPY_alerts.sh [--ticker QQQ] [--percentile 5]
 ## Project Structure
 
 ```
-├── spy_alert/
-│   ├── config.py     # constants and env-var helpers
-│   ├── data.py       # yfinance fetch + return computation
-│   ├── chart.py      # matplotlib histogram
-│   ├── alerts.py     # Twilio SMS + tick evaluation
-│   ├── stream.py     # Finnhub WebSocket handler factory
-│   ├── cli.py        # argparse + main() orchestration
-│   ├── __main__.py   # python -m spy_alert entry point
-│   └── __init__.py
+├── src/
+│   └── spy_alert/
+│       ├── config.py     # constants and env-var helpers
+│       ├── data.py       # yfinance fetch + return computation
+│       ├── chart.py      # matplotlib histogram
+│       ├── alerts.py     # Twilio SMS + tick evaluation
+│       ├── stream.py     # Finnhub WebSocket handler factory
+│       ├── cli.py        # argparse + main() orchestration
+│       ├── __main__.py   # python -m spy_alert entry point
+│       └── __init__.py
 ├── execute_stock_SPY_alerts.sh   # weekday-hours scheduler
 ├── requirements.txt
 └── .env.example

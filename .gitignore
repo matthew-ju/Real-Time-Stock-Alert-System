@@ -1,4 +1,27 @@
+# Secrets — never commit
 .env
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE / OS
 .DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Generated outputs (kept for demo; remove if you prefer clean repo)
+# spy-generated-histogram.png
